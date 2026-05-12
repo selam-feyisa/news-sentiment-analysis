@@ -1,0 +1,36 @@
+name: Python Tests
+
+on:
+  push:
+    branches: [ main, task-1, task-2, task-3 ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.11]
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        
+    - name: Run tests
+      run: |
+        python -m pytest tests/ -v
+        
+    - name: Run notebook checks
+      run: |
+        python -m pip install nbconvert
+        jupyter nbconvert --to notebook --execute notebooks/*.ipynb
